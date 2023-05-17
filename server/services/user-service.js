@@ -43,8 +43,26 @@ class UserService {
         const removeData = await TokenService.removeToken(refreshToken);
         return removeData;
     }
-    async refresh() {
-        
+    async refresh(refreshToken) {
+        if (!refreshToken) {
+            throw new Error('Пользователь не авторизован')
+        }
+        const isValid = TokenService.validateRefresh(refreshToken);
+        if (!isValid) {
+            throw new Error('Пользователь не авторизован')
+        }
+        const tokenData = await TokenService.findToken(refreshToken);
+        if (!tokenData) {
+            throw new Error('Пользователь не авторизован');
+        }
+        const userData = await UserSchema.findById(isValid.id);
+        const user = new UserDto({...userData});
+        const tokens = TokenService.generateTokens(payload);
+        await TokenService.saveTokens(tokens.refreshToken, user.id);
+        return {
+            user,
+            ...tokens
+        };
     }
     async activate() {
         

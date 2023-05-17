@@ -28,7 +28,7 @@ class UserController {
         try {
             const { refreshToken } = req.cookies;
             const removeData = await UserService.logout(refreshToken);
-            res.clearCookie('token');
+            res.clearCookie('refreshToken');
             return res.json(removeData);
         } catch (error) {
             console.log(error)
@@ -36,7 +36,10 @@ class UserController {
     }
     async refresh(req, res, next) {
         try {
-            
+            const { refreshToken } = req.cookies;
+            const userData = await UserService.refresh(refreshToken);
+            res.cookie('refreshToken', userData.refreshToken, {maxAge: 60 * 24 * 60 * 60 * 1000, httpOnly: true});
+            return res.json(userData);
         } catch (error) {
             console.log(error)
         }
