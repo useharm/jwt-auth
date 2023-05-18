@@ -66,8 +66,16 @@ class UserService {
             ...tokens
         };
     }
-    async activate() {
-        
+    async activate(activationLink) {
+        if (!activationLink) {
+            throw new Error('Неверная ссылка активации')
+        }
+        const userData = await UserSchema.findOne({activationLink});
+        if (userData !== activationLink) {
+            throw new Error('Неверная ссылка активации')
+        }
+        userData.isActivated = true;
+        await userData.save();
     }
     async getUsers() {
         

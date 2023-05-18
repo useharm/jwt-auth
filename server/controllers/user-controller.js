@@ -47,7 +47,8 @@ class UserController {
     async activate(req, res, next) {
         try {
             const link = req.params.link;
-            const resData = await UserService.activate(link);
+            await UserService.activate(link);
+            return res.redirect('https://google.com')
         } catch (error) {
             console.log(error)
         }
