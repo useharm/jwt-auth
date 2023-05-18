@@ -46,7 +46,8 @@ class UserController {
     }
     async activate(req, res, next) {
         try {
-            
+            const link = req.params.link;
+            const resData = await UserService.activate(link);
         } catch (error) {
             console.log(error)
         }
