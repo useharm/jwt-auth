@@ -16,8 +16,8 @@ class UserService {
         const hashedPassword = await bcrypt.hash(password, 3);
         const userData = await UserSchema.create({email, password: hashedPassword, activationLink});
         await MailService.sendMail(email, `${process.env.API_URL}/api/activate/${activationLink}`)
-        const user = new UserDto({...userData});
-        const tokens = TokenService.generateTokens(payload);
+        const user = new UserDto(userData);
+        const tokens = TokenService.generateTokens({...user});
         await TokenService.saveTokens(tokens.refreshToken, user.id)
         return {
             user,
@@ -33,8 +33,8 @@ class UserService {
         if (!isEqualHashed) {
             throw new Error('Неверный пароль')
         }
-        const user = new UserDto({...userData});
-        const tokens = TokenService.generateTokens(payload);
+        const user = new UserDto(candidate);
+        const tokens = TokenService.generateTokens({...user});
         await TokenService.saveTokens(tokens.refreshToken, user.id)
         return {
             user,
@@ -67,11 +67,8 @@ class UserService {
         };
     }
     async activate(activationLink) {
-        if (!activationLink) {
-            throw new Error('Неверная ссылка активации')
-        }
         const userData = await UserSchema.findOne({activationLink});
-        if (userData !== activationLink) {
+        if (!userData) {
             throw new Error('Неверная ссылка активации')
         }
         userData.isActivated = true;
