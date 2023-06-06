@@ -58,8 +58,8 @@ class UserService {
             throw new Error('Пользователь не авторизован');
         }
         const userData = await UserSchema.findById(isValid.id);
-        const user = new UserDto({...userData});
-        const tokens = TokenService.generateTokens(payload);
+        const user = new UserDto(userData);
+        const tokens = TokenService.generateTokens({...user});
         await TokenService.saveTokens(tokens.refreshToken, user.id);
         return {
             user,
@@ -75,7 +75,8 @@ class UserService {
         await userData.save();
     }
     async getUsers() {
-        
+        const users = await UserSchema.find();
+        return users;
     }
 }
 
