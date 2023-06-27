@@ -4,13 +4,14 @@ const bcrypt = require('bcrypt');
 const UserDto = require('../dtos/user-dto');
 const TokenService = require('./token-service');
 const MailService = require('./mail-service');
+const ApiError = require('../exceptions/api-errors');
 
 
 class UserService {
     async registration(email, password) {
         const candidate = await UserSchema.findOne({email});
         if (candidate) {
-            throw new Error('Пользователь с таким адресом уже существует');
+            throw ApiError.BadRequestError(`Пользователь с таким адресом ${email} уже существует`);
         }
         const activationLink = uuid.v4();
         const hashedPassword = await bcrypt.hash(password, 3);
@@ -27,11 +28,11 @@ class UserService {
     async login(email, password) {
         const candidate = await UserSchema.findOne({email});
         if (!candidate) {
-            throw new Error('Пользователя с такой почтой не существует');
+            throw ApiError.BadRequestError(`Пользователя с такой почтой ${email} не существует`);
         }
         const isEqualHashed = await bcrypt.compare(password, candidate.password);
         if (!isEqualHashed) {
-            throw new Error('Неверный пароль')
+            throw ApiError.BadRequestError('Неверный пароль')
         }
         const user = new UserDto(candidate);
         const tokens = TokenService.generateTokens({...user});
@@ -47,15 +48,15 @@ class UserService {
     }
     async refresh(refreshToken) {
         if (!refreshToken) {
-            throw new Error('Пользователь не авторизован')
+            throw ApiError.UnauthorizedError();
         }
         const isValid = TokenService.validateRefresh(refreshToken);
         if (!isValid) {
-            throw new Error('Пользователь не авторизован')
+            throw ApiError.UnauthorizedError();;
         }
         const tokenData = await TokenService.findToken(refreshToken);
         if (!tokenData) {
-            throw new Error('Пользователь не авторизован');
+            throw ApiError.UnauthorizedError();
         }
         const userData = await UserSchema.findById(isValid.id);
         const user = new UserDto(userData);
@@ -69,7 +70,7 @@ class UserService {
     async activate(activationLink) {
         const userData = await UserSchema.findOne({activationLink});
         if (!userData) {
-            throw new Error('Неверная ссылка активации')
+            throw ApiError.BadRequestError('Неверная ссылка активации')
         }
         userData.isActivated = true;
         await userData.save();
