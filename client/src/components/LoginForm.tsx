@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { inputType } from '../types/inputTypes';
+import { useAppDispatch } from '../store/store';
+import { registrateUserAsync } from '../store/slices/AsyncSlices/registerSlice/registerSlice';
+import { loginUserAsync } from '../store/slices/AsyncSlices/loginSlice/loginSlice';
 
 
 const LoginForm: React.FC = () => {
@@ -7,7 +10,7 @@ const LoginForm: React.FC = () => {
         email: '',
         password: '',
     })
-
+    const dispatch = useAppDispatch();
 
     return (
         <div>
@@ -21,8 +24,8 @@ const LoginForm: React.FC = () => {
             value={value.password}
             onChange={(e) => setValue({email: value.email, password: e.target.value})}
             ></input>
-            <button>sign in</button>
-            <button>sign up</button>
+            <button onClick={() => dispatch(loginUserAsync(value))}>sign in</button>
+            <button onClick={() => dispatch(registrateUserAsync(value))}>sign up</button>
         </div>
     )
 }
