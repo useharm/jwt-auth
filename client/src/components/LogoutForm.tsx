@@ -1,5 +1,6 @@
 import React from 'react';
 import { useAppDispatch } from '../store/store';
+import { logoutAsync } from '../store/slices/AsyncSlices/logoutSlice/logoutSlice';
 
 
 
@@ -9,7 +10,7 @@ const LogoutForm: React.FC = () => {
 
 
     return(<div>
-        <button>logout</button>
+        <button onClick={() => dispatch(logoutAsync())}>logout</button>
     </div>)
 }
 

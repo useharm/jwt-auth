@@ -6,6 +6,7 @@ interface IusersInfo {
 export interface IState extends IusersInfo {
     status: 'pending' | 'success' | 'rejected';
     error: any;
+    isLoading: boolean;
 }
 export type userType = {
     _id: string;

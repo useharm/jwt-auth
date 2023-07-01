@@ -9,14 +9,15 @@ import { getUsersAsync } from '../store/slices/AsyncSlices/getUsersSlice/getUser
 const UsersList: React.FC = () => {
     const dispatch = useAppDispatch();
     const users = useSelector((state: RootState) => state.getUsersSlice.users);
+    const isAuth = useSelector((state: RootState) => state.userSlice.isAuth);
 
     return(
         <div>
-            <button onClick={() => dispatch(getUsersAsync())}>users list</button>
-            {users.map((item, index) => (<div key={index}>
+            <button onClick={() => dispatch(getUsersAsync())} disabled={isAuth ? false : true}>users list</button>
+            {isAuth ? users.map((item, index) => (<div key={index}>
                 <h3>email - {item.email}</h3>
                 <h4>is activated - {item.isActivated ? 'true' : 'false'}</h4>
-                </div>))}
+                </div>)) : null}
         </div>
     )
 }

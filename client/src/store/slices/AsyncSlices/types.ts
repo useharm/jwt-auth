@@ -5,6 +5,7 @@
 export interface IState {
     status: 'success' | 'pending' | 'rejected';
     error: any;
+    isLoading: boolean;
 }
 
 

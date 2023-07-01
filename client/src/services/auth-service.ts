@@ -9,6 +9,10 @@ class AuthService {
     static async login({email, password}: inputType) {
         const response = await $api.post('/login', {email,password});
         return response;
+    };
+    static async logout() {
+        const response = await $api.post('/logout');
+        return response.data
     }
 }
 
